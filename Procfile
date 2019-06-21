@@ -1,1 +1,1 @@
-web: bokeh serve --port=$PORT --num-procs=0 --host=bokehstockplot.herokuapp.com --address=0.0.0.0 --use-xheaders stockplot.py
+web: bokeh serve --log-level=debug --port=$PORT --num-procs=0 --host=bokehstockplot.herokuapp.com --use-xheaders stockplot.py
