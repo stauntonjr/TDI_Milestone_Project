@@ -35,7 +35,7 @@ def modify_doc(doc):
     year_picker = Select(title="Select a Year",  value="2018", options=[str(i) for i in range(2008,2019)], width=100)
     months = ["January","February", "March", "April", "May", "June", 
               "July", "August", "September", "October", "November", "December"]
-    month_picker = Select(title="Select a Month",  value="January", options=months, width=100)
+    month_picker = Select(title="Select a Month",  value="January", options=months, width=150)
     widgets = row(stock_picker, year_picker, month_picker)
 
     # Get data
@@ -137,7 +137,7 @@ def modify_doc(doc):
     p1.reset.emit()
     p2.reset.emit()
     """))
-    c = column(Div(text="", height=8), b, width=250)
+    c = column(Div(text="", height=8), b, width=200)
 
     # Set up layouts and add to document
     row1 = row(stock_picker, year_picker, month_picker, c, width=800)
