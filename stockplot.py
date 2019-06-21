@@ -60,7 +60,7 @@ def modify_doc(doc):
     source = ColumnDataSource(data=data_dict)
     # create a new plot with a datetime axis type
     p1 = figure(plot_width=800, plot_height=400, x_axis_type="datetime")
-    p2 = figure(plot_width=800, plot_height=150, x_axis_type="datetime", x_range=p1.x_range)
+    p2 = figure(plot_width=800, plot_height=250, x_axis_type="datetime", x_range=p1.x_range)
     # create price glyphs and volume glyph
     p1O = p1.line(x='date', y='open', source=source, color=Spectral5[0], alpha=0.8, legend="OPEN")
     p1C = p1.line(x='date', y='close', source=source, color=Spectral5[1], alpha=0.8, legend="CLOSE")
