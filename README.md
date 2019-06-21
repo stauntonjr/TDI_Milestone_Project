@@ -22,6 +22,9 @@ As such, the Procfile is a run command 'bokeh serve ...'
 Note that Bokeh Server 1.2.0 uses the argument '--allow web-socket-origin=...' and not '--host=...'
 The requirements.txt were auto-generated with pipreqs.
 
+Heroku:
+The app is live at https://bokehstockplot.herokuapp.com/stockplot.
+
 
     
 
