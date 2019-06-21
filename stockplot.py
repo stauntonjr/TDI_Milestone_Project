@@ -145,5 +145,5 @@ def modify_doc(doc):
     row3 = row(p2, width=800, height=150)
     layout = column(row1, row2, row3, width=800)
     doc.add_root(layout)
-
+    doc.title('Plot your Stock! Bokeh/Heroku App by J.R.Staunton ')
 modify_doc(curdoc())
