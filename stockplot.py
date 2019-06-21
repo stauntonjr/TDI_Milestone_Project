@@ -8,9 +8,9 @@ import json
 import pandas as pd
 from bokeh.io import curdoc
 from bokeh.server.server import Server
-from bokeh.models import ColumnDataSource, NumeralTickFormatter, HoverTool
+from bokeh.models import ColumnDataSource, NumeralTickFormatter, HoverTool, Button, CustomJS
 from bokeh.models.ranges import Range1d
-from bokeh.models.widgets import Select
+from bokeh.models.widgets import Select, Button, Div
 from bokeh.plotting import figure
 from bokeh.layouts import row, column
 from bokeh.palettes import Spectral5
@@ -32,10 +32,10 @@ def modify_doc(doc):
     df_0 = df_0.reindex(columns=['name','code'])
     # Make widgets
     stock_picker = Select(title="Select a Stock",  value=df_0['name'][0], options=df_0['name'].tolist())
-    year_picker = Select(title="Select a Year",  value="2018", options=[str(i) for i in range(2008,2019)])
+    year_picker = Select(title="Select a Year",  value="2018", options=[str(i) for i in range(2008,2019)], width=100)
     months = ["January","February", "March", "April", "May", "June", 
               "July", "August", "September", "October", "November", "December"]
-    month_picker = Select(title="Select a Month",  value="January", options=months)
+    month_picker = Select(title="Select a Month",  value="January", options=months, width=100)
     widgets = row(stock_picker, year_picker, month_picker)
 
     # Get data
@@ -54,7 +54,6 @@ def modify_doc(doc):
 
     # Make figure
     df = get_data(AV_API_key, 'A')
-    dfi = df.set_index(['date'])
     data_dict = df.to_dict('series')
     data_dict = {k:data_dict[k][::-1] for k in data_dict.keys()}
     source = ColumnDataSource(data=data_dict)
@@ -103,27 +102,45 @@ def modify_doc(doc):
         source.data = data_dict
         
     def update_axis(attrname, old, new):
+        print('updating axes')
         # Get the current Select values
         year = year_picker.value
         month = f'{months.index(month_picker.value) + 1:02d}'   
         start = datetime.strptime(f'{year}-{month}-01', "%Y-%m-%d")
+        print('year: ', year)
+        print('month: ', month)
         if month == '12':
             end = datetime.strptime(f'{str(int(year)+1)}-01-01', "%Y-%m-%d")
         else:
             end = datetime.strptime(f'{year}-{int(month)+1:02d}-01', "%Y-%m-%d")     
+        source.data = data_dict
         p1.x_range.start = start
         p1.x_range.end = end
+        dfi = df.set_index(['date'])
+        print(dfi.loc[end:start])
+        print(dfi.loc[end:start]['low'].min()*0.95)
+        print(dfi.loc[end:start]['high'].max()*1.05)
+        print(dfi.loc[end:start]['volume'].min()*0.95)
+        print(dfi.loc[end:start]['volume'].max()*1.05)
         p1.y_range.start = dfi.loc[end:start]['low'].min()*0.95
         p1.y_range.end = dfi.loc[end:start]['high'].max()*1.05
         p2.y_range.start = dfi.loc[end:start]['volume'].min()*0.95
         p2.y_range.end = dfi.loc[end:start]['volume'].max()*1.05
+        
 
     stock_picker.on_change('value', update_source)
     year_picker.on_change('value', update_axis)
     month_picker.on_change('value', update_axis)
-        
+
+    b = Button(label='Reset to Full History')
+    b.js_on_click(CustomJS(args=dict(p1=p1, p2=p2), code="""
+    p1.reset.emit()
+    p2.reset.emit()
+    """))
+    c = column(Div(text="", height=8), b, width=250)
+
     # Set up layouts and add to document
-    row1 = row(stock_picker, year_picker, month_picker, width=800)
+    row1 = row(stock_picker, year_picker, month_picker, c, width=800)
     row2 = row(p1, width=800, height=400)
     row3 = row(p2, width=800, height=150)
     layout = column(row1, row2, row3, width=800)
